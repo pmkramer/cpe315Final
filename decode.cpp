@@ -547,16 +547,63 @@ int decode (const STM_Type data) {
   // 315: add code to print stm 
   if (opts.instrs) {
         bool multiple = FALSE;
-        cout << "stm r" << data.instr.stm.rn << "!";
+        cout << "stm r" << data.instr.stm.rn << "! {";
+        if (data.instr.stm.reg_list & 1) {
+            cout << "r0";
+            multiple = TRUE;
+        }
+        if (data.instr.stm.reg_list & 2) {
+            if (multiple)
+                cout << ", ";
+            cout << "r1";
+            multiple = TRUE;
+        }
+        if (data.instr.stm.reg_list & 4) {
+            if (multiple)
+                cout << ", ";
+            cout << "r2";
+            multiple = TRUE;
+        }
+        if (data.instr.stm.reg_list & 8) {
+            if (multiple)
+                cout << ", ";
+            cout << "r3";
+            multiple = TRUE;
+        }
+        if (data.instr.stm.reg_list & 16) {
+            if (multiple)
+                cout << ", ";
+            cout << "r4";
+            multiple = TRUE;
+        }
+        if (data.instr.stm.reg_list & 32) {
+            if (multiple)
+                cout << ", ";
+            cout << "r5";
+            multiple = TRUE;
+        }
+        if (data.instr.stm.reg_list & 64) {
+            if (multiple)
+                cout << ", ";
+            cout << "r6";
+            multiple = TRUE;
+        }
+        if (data.instr.stm.reg_list & 128) {
+            if (multiple)
+                cout << ", ";
+            cout << "r7";
+        }
+        cout << "}";
     }
   return STM;
 }
 
 int decode (const LDRL_Type data) {
   // 315: add code to print ldr
-  if (opts.instrs) {
+    if (opts.instrs) {
+        cout << "ldr r" << data.instr.ldrl.rt << ", =0x" << hex << data.instr.ldrl.imm << endl;      
     }
-  return LDRL;
+    return LDRL;
 }
 
 int decode (const ADD_SP_Type data) {
