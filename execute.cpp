@@ -1,5 +1,6 @@
 #include "thumbsim.hpp"
 // These are just the register NUMBERS
+// RANDOM COMMENT FOR MERGE PRACTICE
 #define PC_REG 15  
 #define LR_REG 14
 #define SP_REG 13
