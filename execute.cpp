@@ -15,6 +15,13 @@ Caches caches(0);
 // CPE 315: you'll need to implement a custom sign-extension function
 // in addition to the ones given below, specifically for the unconditional
 // branch instruction, which has an 11-bit immediate field
+
+// Added by me
+// DONE (double check)
+unsigned int signExtend11to32ui(short i) {
+  return static_cast<unsigned int>(static_cast<int>((i << 21) >> 21));
+}
+  
 unsigned int signExtend16to32ui(short i) {
   return static_cast<unsigned int>(static_cast<int>(i));
 }
@@ -22,6 +29,7 @@ unsigned int signExtend16to32ui(short i) {
 unsigned int signExtend8to32ui(char i) {
   return static_cast<unsigned int>(static_cast<int>(i));
 }
+
 
 // This is the global object you'll use to store condition codes N,Z,V,C
 // Set these bits appropriately in execute below.
@@ -91,6 +99,7 @@ void setCarryOverflow (int num1, int num2, OFType oftype) {
 
 // CPE 315: You're given the code for evaluating BEQ, and you'll need to 
 // complete the rest of these conditions. See Page 208 of the armv7 manual
+// DONE
 static int checkCondition(unsigned short cond) {
   switch(cond) {
     case EQ:
