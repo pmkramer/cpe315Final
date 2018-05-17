@@ -39,6 +39,19 @@ ASPR flags;
 // CPE 315: You need to implement a function to set the Negative and Zero
 // flags for each instruction that does that. It only needs to take
 // one parameter as input, the result of whatever operation is executing
+// DONE
+void setNegativeZero(int result)
+{
+   if (result < 0)
+      flags.N = 1;
+   else
+      flags.N = 0;
+
+   if (result == 0)
+      flags.Z = 1;
+   else
+      flags.Z = 0;
+}
 
 // This function is complete, you should not have to modify it
 void setCarryOverflow (int num1, int num2, OFType oftype) {
