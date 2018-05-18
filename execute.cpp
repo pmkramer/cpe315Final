@@ -1,6 +1,5 @@
 #include "thumbsim.hpp"
 // These are just the register NUMBERS
-// RANDOM COMMENT FOR MERGE PRACTICE
 #define PC_REG 15  
 #define LR_REG 14
 #define SP_REG 13
@@ -363,10 +362,28 @@ void execute() {
       misc_ops = decode(misc);
       switch(misc_ops) {
         case MISC_PUSH:
-          // need to implement
+            for (i = 0; i < 8; ++i) {
+                if (misc.instr.push.reg_list & (1 << i) ) {
+                    rf.write(SP_REG, SP - 4);
+                    dmem.write(SP, rf[i]);
+                }
+            }
+            if (misc.instr.push.m) {
+                rf.write(SP_REG, SP - 4);
+                dmem.write(SP , LR);
+            }
           break;
         case MISC_POP:
-          // need to implement
+            if (misc.instr.pop.m) {
+                rf.write(PC_REG, dmem[SP]);
+                rf.write(SP_REG, SP + 4);
+            }
+            for (i = 7; i >= 0; --i) {
+                if (misc.instr.pop.reg_list & (1 << i)) {
+                    rf.write(i, dmem[SP]);
+                    rf.write(SP_REG, SP + 4);
+                }
+            }
           break;
         case MISC_SUB:
           // functionally complete, needs stats
