@@ -198,7 +198,9 @@ void execute() {
   Data32 temp(0); // Use this for STRB instructions
   Thumb_Types itype;
   // the following counts as a read to PC
+  // DONE
   unsigned int pctarget = PC + 2;
+  stats.numRegReads += 1;
   unsigned int addr;
   int i, n, offset;
   unsigned int list, mask;
@@ -228,7 +230,9 @@ void execute() {
   MISC_Ops misc_ops;
 
   // This counts as a write to the PC register
+  // DONE
   rf.write(PC_REG, pctarget);
+  stats.numRegWrites += 1;  
 
   itype = decode(ALL_Types(instr));
 
@@ -243,27 +247,40 @@ void execute() {
           break;
         case ALU_ADDR:
           // needs stats and flags
+          // STATS DONE
           rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
+          stats.numRegReads += 2;
+          stats.numRegWrites += 1;
           break;
         case ALU_SUBR:
           break;
         case ALU_ADD3I:
           // needs stats and flags
+          // STATS DONE
           rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
           break;
         case ALU_SUB3I:
           break;
         case ALU_MOV:
           // needs stats and flags
+          // STATS DONE
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
+          stats.numRegWrites += 1;
           break;
         case ALU_CMP:
+          // DONE
           setNegativeZero(rf[alu.instr.cmp.rdn] - alu.instr.cmp.imm);
           setCarryOverflow(rf[alu.instr.cmp.rdn], alu.instr.cmp.imm, OF_SUB);
+          stats.numRegReads += 1;
           break;
         case ALU_ADD8I:
           // needs stats and flags
+          // STATS DONE
           rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
           break;
         case ALU_SUB8I:
           break;
@@ -317,7 +334,10 @@ void execute() {
       switch(sp_ops) {
         case SP_MOV:
           // needs stats and flags
+          // STATS DONE
           rf.write((sp.instr.mov.d << 3 ) | sp.instr.mov.rd, rf[sp.instr.mov.rm]);
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
           break;
         case SP_ADD:
         case SP_CMP:
@@ -332,13 +352,21 @@ void execute() {
       switch(ldst_ops) {
         case STRI:
           // functionally complete, needs stats
+          // DONE
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt]);
+          stats.numRegReads += 1;
+          stats.numRegReads += 1;
+          stats.numMemWrites += 1;
           break;
         case LDRI:
           // functionally complete, needs stats
+          // DONE
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
+          stats.numMemReads += 1;
           break;
         case STRR:
           // need to implement
@@ -364,6 +392,8 @@ void execute() {
       misc_ops = decode(misc);
       switch(misc_ops) {
         case MISC_PUSH:
+            // need to implement
+            // CHECK STATS
             for (i = 0; i < 8; ++i) {
                 if (misc.instr.push.reg_list & (1 << i) ) {
                     rf.write(SP_REG, SP - 4);
@@ -376,6 +406,8 @@ void execute() {
             }
           break;
         case MISC_POP:
+            // need to implement
+            // CHECK STATS
             if (misc.instr.pop.m) {
                 rf.write(PC_REG, dmem[SP]);
                 rf.write(SP_REG, SP + 4);
@@ -389,11 +421,17 @@ void execute() {
           break;
         case MISC_SUB:
           // functionally complete, needs stats
+          // STATS DONE (does SP count as a read?)
           rf.write(SP_REG, SP - (misc.instr.sub.imm*4));
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
           break;
         case MISC_ADD:
           // functionally complete, needs stats
+          // STATS DONE (does SP count as a read?)
           rf.write(SP_REG, SP + (misc.instr.add.imm*4));
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
           break;
       }
       break;
@@ -402,15 +440,21 @@ void execute() {
       // Once you've completed the checkCondition function,
       // this should work for all your conditional branches.
       // needs stats
+      // STATS DONE (does PC count as a read?)
       if (checkCondition(cond.instr.b.cond)){
         rf.write(PC_REG, PC + 2 * signExtend8to32ui(cond.instr.b.imm) + 2);
+        stats.numRegWrites += 1;
+        stats.numRegReads += 1;
       }
       break;
     case UNCOND:
       // Essentially the same as the conditional branches, but with no
       // condition check, and an 11-bit immediate field
+      // STATS DONE
       decode(uncond);
       rf.write(PC_REG, PC + 2 * signExtend11to32ui(uncond.instr.b.imm) + 2);
+      stats.numRegReads += 1;
+      stats.numRegWrites += 1;
       break;
     case LDM:
       decode(ldm);
@@ -443,8 +487,11 @@ void execute() {
       break;
     case ADD_SP:
       // needs stats
+      // STATS DONE (does SP count as a read?)
       decode(addsp);
       rf.write(addsp.instr.add.rd, SP + (addsp.instr.add.imm*4));
+      stats.numRegReads += 1;
+      stats.numRegWrites += 1;
       break;
     default:
       cout << "[ERROR] Unknown Instruction to be executed" << endl;
