@@ -370,21 +370,48 @@ void execute() {
           break;
         case STRR:
           // need to implement
+          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
+          dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt]);
+          stats.numRegReads += 3;
+          stats.numMemWrites += 1;
           break;
         case LDRR:
           // need to implement
+          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
+          rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr]);
+          stats.numRegReads += 2;
+          stats.numRegWrites += 1;
+          stats.numMemReads += 1;
           break;
         case STRBI:
           // need to implement
+          addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
+          dmem.write(addr, static_cast<unsigned short> (rf[ld_st.instr.ld_st_reg.rt] &0x00ff));
+          stats.numRegReads += 2;
+          stats.numMemWrites += 1;
           break;
         case LDRBI:
           // need to implement
+          addr = rf[ld_st.instr.ld_st_reg.rn] + ld_st.instr.ld_st_imm.imm * 4;
+          rf.write(ld_st.instr.ld_st_imm.rt, (dmem[addr] & 0x00ff));
+          stats.numRegWrites += 1;
+          stats.numRegReads += 1;
+          stats.numMemReads += 1;
           break;
         case STRBR:
           // need to implement
+          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
+          dmem.write(addr, static_cast<unsigned short> (rf[ld_st.instr.ld_st_reg.rt] & 0x00ff));
+          stats.numRegReads += 3;
+          stats.numMemWrites += 1;
           break;
         case LDRBR:
           // need to implement
+          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
+          rf.write(ld_st.instr.ld_st_reg.rt, (dmem[addr] & 0x00ff));
+          stats.numRegReads += 2;
+          stats.numRegWrites += 1;
+          stats.numMemReads += 1;
           break;
       }
       break;
@@ -394,30 +421,50 @@ void execute() {
         case MISC_PUSH:
             // need to implement
             // CHECK STATS
+            addr = SP;
             for (i = 0; i < 8; ++i) {
                 if (misc.instr.push.reg_list & (1 << i) ) {
-                    rf.write(SP_REG, SP - 4);
-                    dmem.write(SP, rf[i]);
+                    addr = addr - 4;
+                    caches.access(addr);
+                    dmem.write(addr, rf[i]);
+
+                    stats.numRegReads += 1;
+                    stats.numMemWrites += 1;
                 }
             }
             if (misc.instr.push.m) {
-                rf.write(SP_REG, SP - 4);
+                addr = addr - 4;
+                caches.access(addr);
                 dmem.write(SP , LR);
+                stats.numRegReads += 1;
+                stats.numMemWrites += 1;
             }
+            rf.write(SP_REG, addr);
+
+            stats.numRegReads += 1;
+            stats.numRegWrites += 1;
           break;
         case MISC_POP:
             // need to implement
             // CHECK STATS
+            addr = SP;
             if (misc.instr.pop.m) {
-                rf.write(PC_REG, dmem[SP]);
-                rf.write(SP_REG, SP + 4);
+                rf.write(PC_REG, dmem[addr]);
+                addr = addr + 4;
+                stats.numMemReads +=1;
+                stats.numRegWrites += 1;
             }
             for (i = 7; i >= 0; --i) {
                 if (misc.instr.pop.reg_list & (1 << i)) {
-                    rf.write(i, dmem[SP]);
-                    rf.write(SP_REG, SP + 4);
+                    rf.write(i, dmem[addr]);
+                    addr = addr + 4;
+                    stats.numRegWrites += 1;
+                    stats.numMemReads += 1;
                 }
             }
+            rf.write(SP_REG, addr);
+            stats.numRegWrites += 1;
+            stats.numRegReads += 1;
           break;
         case MISC_SUB:
           // functionally complete, needs stats
