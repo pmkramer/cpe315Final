@@ -253,6 +253,10 @@ void execute() {
           stats.numRegWrites += 1;
           break;
         case ALU_SUBR:
+          // STATS DONE
+          rf.write(alu.instr.subr.rd, rf[alu.instr.subr.rn] + rf[alu.instr.subr.rm]);
+          stats.numRegReads += 2;
+          stats.numRegWrites += 1;
           break;
         case ALU_ADD3I:
           // needs stats and flags
@@ -262,6 +266,10 @@ void execute() {
           stats.numRegWrites += 1;
           break;
         case ALU_SUB3I:
+          // STATS DONE
+          rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] + alu.instr.sub3i.imm);
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
           break;
         case ALU_MOV:
           // needs stats and flags
@@ -283,6 +291,10 @@ void execute() {
           stats.numRegWrites += 1;
           break;
         case ALU_SUB8I:
+          // STATS DONE
+          rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] + alu.instr.sub8i.imm);
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
           break;
         default:
           cout << "instruction not implemented" << endl;
