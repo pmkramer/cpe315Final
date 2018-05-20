@@ -355,8 +355,7 @@ void execute() {
           // DONE
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt]);
-          stats.numRegReads += 1;
-          stats.numRegReads += 1;
+          stats.numRegReads += 2;
           stats.numMemWrites += 1;
           break;
         case LDRI:
@@ -422,7 +421,14 @@ void execute() {
             // need to implement
             // CHECK STATS
             addr = SP;
-            for (i = 0; i < 8; ++i) {
+            if (misc.instr.push.m) {
+                addr = addr - 4;
+                caches.access(addr);
+                dmem.write(addr, LR);
+                stats.numRegReads += 1;
+                stats.numMemWrites += 1;
+            }
+            for (i = 7; i >= 0; --i) {
                 if (misc.instr.push.reg_list & (1 << i) ) {
                     addr = addr - 4;
                     caches.access(addr);
@@ -432,13 +438,7 @@ void execute() {
                     stats.numMemWrites += 1;
                 }
             }
-            if (misc.instr.push.m) {
-                addr = addr - 4;
-                caches.access(addr);
-                dmem.write(SP , LR);
-                stats.numRegReads += 1;
-                stats.numMemWrites += 1;
-            }
+            
             rf.write(SP_REG, addr);
 
             stats.numRegReads += 1;
@@ -448,19 +448,21 @@ void execute() {
             // need to implement
             // CHECK STATS
             addr = SP;
-            if (misc.instr.pop.m) {
-                rf.write(PC_REG, dmem[addr]);
-                addr = addr + 4;
-                stats.numMemReads +=1;
-                stats.numRegWrites += 1;
-            }
-            for (i = 7; i >= 0; --i) {
+            for (i = 0; i < 8; ++i) {
                 if (misc.instr.pop.reg_list & (1 << i)) {
+                    caches.access(addr);
                     rf.write(i, dmem[addr]);
                     addr = addr + 4;
                     stats.numRegWrites += 1;
                     stats.numMemReads += 1;
                 }
+            }
+            if (misc.instr.pop.m) {
+                caches.access(addr);
+                rf.write(PC_REG, dmem[addr]);
+                addr = addr + 4;
+                stats.numMemReads += 1;
+                stats.numRegWrites += 1;
             }
             rf.write(SP_REG, addr);
             stats.numRegWrites += 1;
