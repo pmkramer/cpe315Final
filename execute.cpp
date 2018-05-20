@@ -338,6 +338,9 @@ void execute() {
       switch(dp_ops) {
         case DP_CMP:
           // need to implement
+          setNegativeZero(rf[dp.instr.DP_Instr.rdn] - rf[dp.instr.DP_Instr.rm]);
+          setCarryOverflow(rf[dp.instr.DP_Instr.rdn], rf[dp.instr.DP_Instr.rm], OF_SUB);
+          stats.numRegReads += 2;
           break;
       }
       break;
@@ -352,8 +355,16 @@ void execute() {
           stats.numRegWrites += 1;
           break;
         case SP_ADD:
+          // STATS DONE
+          rf.write((sp.instr.add.d << 3) | sp.instr.add.rd, rf[(sp.instr.add.d << 3) | sp.instr.add.rd] + rf[sp.instr.add.rm]);
+          stats.numRegReads += 2;
+          stats.numRegWrites += 1;
         case SP_CMP:
           // need to implement these
+          // DONE
+          setNegativeZero(rf[(sp.instr.cmp.d << 3) | sp.instr.cmp.rd] - rf[sp.instr.cmp.rm]);
+          setCarryOverflow(rf[(sp.instr.cmp.d << 3) | sp.instr.cmp.rd], rf[sp.instr.cmp.rm], OF_SUB);
+          stats.numRegReads += 2;
           break;
       }
       break;
