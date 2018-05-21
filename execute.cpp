@@ -513,6 +513,19 @@ void execute() {
       // this should work for all your conditional branches.
       // needs stats
       // STATS DONE (does PC count as a read?)
+      if (PC < PC + 2 * signExtend8to32ui(cond.instr.b.imm) + 2) {
+        if (checkCondition(cond.instr.b.cond)) {
+            stats.numForwardBranchesTaken += 1;
+        } else {
+            stats.numForwardBranchesNotTaken += 1;
+        }
+      } else {
+        if (checkCondition(cond.instr.b.cond)) {
+            stats.numBackwardBranchesTaken += 1;
+        } else {
+            stats.numBackwardBranchesNotTaken += 1;
+        }
+      }
       if (checkCondition(cond.instr.b.cond)){
         rf.write(PC_REG, PC + 2 * signExtend8to32ui(cond.instr.b.imm) + 2);
         stats.numRegWrites += 1;
@@ -522,7 +535,7 @@ void execute() {
     case UNCOND:
       // Essentially the same as the conditional branches, but with no
       // condition check, and an 11-bit immediate field
-      // STATS DONE
+      // STATS DONE 
       decode(uncond);
       rf.write(PC_REG, PC + 2 * signExtend11to32ui(uncond.instr.b.imm) + 2);
       stats.numRegReads += 1;
