@@ -248,6 +248,8 @@ void execute() {
           setNegativeZero(result);
           setCarryOverflow(rf[alu.instr.lsli.rm], alu.instr.lsli.imm, OF_SHIFT); 
           rf.write(alu.instr.lsli.rd, result);
+          stats.numRegReads += 1;
+          stats.numRegWrites += 1;
           break;
         case ALU_ADDR:
           // needs stats and flags
@@ -416,14 +418,14 @@ void execute() {
           break;
         case STRR:
           // need to implement
-          addr = rf[ld_st.instr.ld_st_reg.rn] + (rf[ld_st.instr.ld_st_reg.rm] * 4) ;
+          addr = rf[ld_st.instr.ld_st_reg.rn] + (rf[ld_st.instr.ld_st_reg.rm]) ;
           dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt]);
           stats.numRegReads += 3;
           stats.numMemWrites += 1;
           break;
         case LDRR:
           // need to implement
-          addr = rf[ld_st.instr.ld_st_reg.rn] + (rf[ld_st.instr.ld_st_reg.rm] * 4);
+          addr = rf[ld_st.instr.ld_st_reg.rn] + (rf[ld_st.instr.ld_st_reg.rm]);
           rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr]);
           stats.numRegReads += 2;
           stats.numRegWrites += 1;
@@ -538,7 +540,7 @@ void execute() {
       // this should work for all your conditional branches.
       // needs stats
       // STATS DONE (does PC count as a read?)
-      if (PC < PC + 2 * signExtend8to32ui(cond.instr.b.imm) + 2) {
+      if (PC < PC + 2 * signExtend8to32ui(cond.instr.b.imm)) {
         if (checkCondition(cond.instr.b.cond)) {
             stats.numForwardBranchesTaken += 1;
         } else {
