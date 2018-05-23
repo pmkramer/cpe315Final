@@ -288,14 +288,14 @@ LD_ST_Ops decode (const LD_ST_Type data) {
     if (data.instr.ld_st_imm.op == LD_ST_LDB) {
       // 315: write code to print ldrb 
       if (opts.instrs) {
-            cout << "ldrb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn << ", #" << setbase(10) << (data.instr.ld_st_imm.imm*4) << "]" << endl;
+            cout << "ldrb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn << ", #" << setbase(10) << (data.instr.ld_st_imm.imm) << "]" << endl;
         }
       return LDRBI;
     }
     else if (data.instr.ld_st_imm.op == LD_ST_STB) {
       // 315: write code to print strb
       if (opts.instrs){
-            cout << "strb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn << ", #" << setbase(10) << (data.instr.ld_st_imm.imm*4) << "]" << endl;
+            cout << "strb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn << ", #" << setbase(10) << (data.instr.ld_st_imm.imm) << "]" << endl;
         }
       return STRBI;
     }
@@ -606,7 +606,7 @@ int decode (const STM_Type data) {
 int decode (const LDRL_Type data) {
   // 315: add code to print ldr
     if (opts.instrs) {
-        cout << "ldr r" << data.instr.ldrl.rt << ", =0x" << hex << data.instr.ldrl.imm << endl;      
+        cout << "ldr r" << data.instr.ldrl.rt << ", [pc, #" << setbase(10) << (data.instr.ldrl.imm*4) << "]" << endl;      
     }
     return LDRL;
 }

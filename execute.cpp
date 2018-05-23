@@ -262,8 +262,8 @@ void execute() {
         case ALU_SUBR:
           // STATS DONE
           result = rf[alu.instr.subr.rn] - rf[alu.instr.subr.rm];
-          setNegativeZero(result);
-          setCarryOverflow(rf[alu.instr.subr.rn], rf[alu.instr.subr.rm], OF_SUB);
+          //setNegativeZero(result);
+          //setCarryOverflow(rf[alu.instr.subr.rn], rf[alu.instr.subr.rm], OF_SUB);
           rf.write(alu.instr.subr.rd, result);
           stats.numRegReads += 2;
           stats.numRegWrites += 1;
@@ -281,8 +281,8 @@ void execute() {
         case ALU_SUB3I:
           // STATS DONE
           result = rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm;
-          setNegativeZero(result);
-          setCarryOverflow(rf[alu.instr.sub3i.rn], alu.instr.sub3i.imm, OF_SUB);
+          //setNegativeZero(result);
+          //setCarryOverflow(rf[alu.instr.sub3i.rn], alu.instr.sub3i.imm, OF_SUB);
           rf.write(alu.instr.sub3i.rd, result);
           stats.numRegReads += 1;
           stats.numRegWrites += 1;
@@ -314,8 +314,8 @@ void execute() {
         case ALU_SUB8I:
           // STATS DONE
           result = rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm;
-          setNegativeZero(result);
-          setCarryOverflow(rf[alu.instr.sub8i.rdn], alu.instr.sub8i.imm, OF_SUB);
+          //setNegativeZero(result);
+          //setCarryOverflow(rf[alu.instr.sub8i.rdn], alu.instr.sub8i.imm, OF_SUB);
           rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
           stats.numRegReads += 1;
           stats.numRegWrites += 1;
@@ -454,7 +454,7 @@ void execute() {
           break;
         case LDRBR:
           // need to implement
-          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
+          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] ;
           rf.write(ld_st.instr.ld_st_reg.rt, (((dmem[addr] & 0xff000000) >> 24) & 0x000000ff));
           stats.numRegReads += 2;
           stats.numRegWrites += 1;
