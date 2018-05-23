@@ -110,7 +110,7 @@ ALU_Ops decode (const ALU_Type data) {
     // 315: insert code here to print subs instruction
     // DONE
     if (opts.instrs) {
-        cout << "subs r" << data.instr.sub3i.rd << ", r" << data.instr.sub3i.rd << ", #" << data.instr.sub3i.imm << endl;
+        cout << "subs r" << data.instr.sub3i.rd << ", r" << data.instr.sub3i.rn << ", #" << data.instr.sub3i.imm << endl;
     }
     return ALU_SUB3I;
   }
@@ -201,14 +201,14 @@ SP_Ops decode (const SP_Type data) {
                     cout << "r" << setbase(10) << data.instr.add.rm << endl;
                 }
             } else if (data.instr.add.rm == 13) {
-                cout << " r" << setbase(10) << (8+data.instr.add.rd) << ", sp, sp" << endl;
+                cout << " r" << setbase(10) << (8+data.instr.add.rd) << ", r" << setbase(10) << (8+data.instr.add.rd) << ", sp" << endl;
             } else {
-                cout << " r" << setbase(10) << (8+data.instr.add.rd) << ", sp, r" << setbase(10) << data.instr.add.rm << endl;
+                cout << " r" << setbase(10) << (8+data.instr.add.rd) << ", r" << setbase(10) << (8+data.instr.add.rd) << ", r" << setbase(10) << data.instr.add.rm << endl;
             }
         } else if (data.instr.add.rm == 13) {
-            cout << " r" << data.instr.add.rd << ", sp, sp" << endl;
+            cout << " r" << data.instr.add.rd << ", r" << setbase(10) << (data.instr.add.rd) << ", sp" << endl;
         } else {
-            cout << " r" << setbase(10) << data.instr.add.rd << ", sp, r" << data.instr.add.rm << endl;
+            cout << " r" << setbase(10) << data.instr.add.rd << ", r" << setbase(10) << data.instr.add.rd << ", r" << data.instr.add.rm << endl;
         }
     }
     return SP_ADD;
@@ -497,7 +497,7 @@ int decode (const LDM_Type data) {
   // 315: add code to print ldm
   if (opts.instrs) {
         bool multiple = FALSE;
-        cout << "ldm r" << data.instr.ldm.rn << " {";
+        cout << "ldm r" << data.instr.ldm.rn << "!, {";
         if (data.instr.ldm.reg_list & 1) {
             cout << "r0";
             multiple = TRUE;
@@ -543,7 +543,7 @@ int decode (const LDM_Type data) {
                 cout << ", ";
             cout << "r7";
         }
-        cout << "}";
+        cout << "}" << endl;
     } 
   return LDM;
 }
@@ -552,7 +552,7 @@ int decode (const STM_Type data) {
   // 315: add code to print stm 
   if (opts.instrs) {
         bool multiple = FALSE;
-        cout << "stm r" << data.instr.stm.rn << "! {";
+        cout << "stm r" << data.instr.stm.rn << "!, {";
         if (data.instr.stm.reg_list & 1) {
             cout << "r0";
             multiple = TRUE;

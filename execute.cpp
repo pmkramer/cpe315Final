@@ -483,6 +483,7 @@ void execute() {
                 addr = addr - 4;
                 caches.access(addr);
                 dmem.write(addr, LR);
+
                 stats.numRegReads += 1;
                 stats.numMemWrites += 1;
             }
