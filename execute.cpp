@@ -403,6 +403,7 @@ void execute() {
           // functionally complete, needs stats
           // DONE
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
+          caches.access(addr);
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt]);
           stats.numRegReads += 2;
           stats.numMemWrites += 1;
@@ -411,6 +412,7 @@ void execute() {
           // functionally complete, needs stats
           // DONE
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
+          caches.access(addr);
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
           stats.numRegReads += 1;
           stats.numRegWrites += 1;
@@ -419,6 +421,7 @@ void execute() {
         case STRR:
           // need to implement
           addr = rf[ld_st.instr.ld_st_reg.rn] + (rf[ld_st.instr.ld_st_reg.rm]) ;
+          caches.access(addr);
           dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt]);
           stats.numRegReads += 3;
           stats.numMemWrites += 1;
@@ -426,6 +429,7 @@ void execute() {
         case LDRR:
           // need to implement
           addr = rf[ld_st.instr.ld_st_reg.rn] + (rf[ld_st.instr.ld_st_reg.rm]);
+          caches.access(addr);
           rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr]);
           stats.numRegReads += 2;
           stats.numRegWrites += 1;
@@ -434,6 +438,7 @@ void execute() {
         case STRBI:
           // need to implement
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm;
+          caches.access(addr);
           dmem.write(addr, (dmem[addr] & 0x00ffffff) | ((rf[ld_st.instr.ld_st_reg.rt] & 0x000000ff) << 24));
           stats.numRegReads += 2;
           stats.numMemWrites += 1;
@@ -441,6 +446,7 @@ void execute() {
         case LDRBI:
           // need to implement
           addr = rf[ld_st.instr.ld_st_reg.rn] + ld_st.instr.ld_st_imm.imm;
+          caches.access(addr);
           rf.write(ld_st.instr.ld_st_imm.rt, (((dmem[addr] & 0xff000000) >> 24) & 0x000000ff));
           stats.numRegWrites += 1;
           stats.numRegReads += 1;
@@ -450,13 +456,15 @@ void execute() {
           // fix sign extend issue
           // need to implement
           addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
+          caches.access(addr);
           dmem.write(addr, (dmem[addr] & 0x00ffffff) |((rf[ld_st.instr.ld_st_reg.rt] & 0x000000ff) << 24));
           stats.numRegReads += 3;
           stats.numMemWrites += 1;
           break;
         case LDRBR:
           // need to implement
-          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] ;
+          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
+          caches.access(addr);
           rf.write(ld_st.instr.ld_st_reg.rt, (((dmem[addr] & 0xff000000) >> 24) & 0x000000ff));
           stats.numRegReads += 2;
           stats.numRegWrites += 1;
@@ -570,11 +578,38 @@ void execute() {
       break;
     case LDM:
       decode(ldm);
-      // need to implement
+      // DONE
+      addr = rf[ldm.instr.ldm.rn];
+      for (i = 0; i < 8; ++i) {
+        if (ldm.instr.ldm.reg_list & (1 << i)) {
+            caches.access(addr);
+            rf.write(i, dmem[addr]);
+            addr = addr + 4;
+            stats.numRegWrites += 1;
+            stats.numMemReads += 1;
+        }
+      }
+      rf.write(ldm.instr.ldm.rn, addr);
+      stats.numRegWrites += 1;
+      stats.numRegReads += 1;
       break;
     case STM:
       decode(stm);
-      // need to implement
+      // DONE
+      addr = rf[stm.instr.stm.rn];
+      for (i = 7; i >= 0; --i) {
+        if (stm.instr.stm.reg_list & (1 << i)) {
+            caches.access(addr);
+            dmem.write(addr, rf[i]);
+            addr = addr + 4;
+
+            stats.numMemWrites += 1;
+            stats.numRegReads += 1;
+        }
+      }
+      rf.write(stm.instr.stm.rn, addr);
+      stats.numRegWrites += 1;
+      stats.numRegReads += 1;
       break;
     case LDRL:
       // This instruction is complete, nothing needed
