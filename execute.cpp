@@ -387,15 +387,17 @@ void execute() {
         case SP_MOV:
           // needs stats and flags
           // STATS DONE
+          setNegativeZero(rf[sp.instr.mov.rm]);
+          flags.C = 0;
           rf.write((sp.instr.mov.d << 3 ) | sp.instr.mov.rd, rf[sp.instr.mov.rm]);
-         stats.numRegReads += 1;
+          stats.numRegReads += 1;
           stats.numRegWrites += 1;
           stats.instrs++;
           break;
         case SP_ADD:
           // STATS DONE
           rf.write((sp.instr.add.d << 3) | sp.instr.add.rd, rf[(sp.instr.add.d << 3) | sp.instr.add.rd] + rf[sp.instr.add.rm]);
-         // stats.numRegReads += 1;
+          //stats.numRegReads += 2;
           stats.numRegWrites += 1;
           //stats.instrs++;
         case SP_CMP:

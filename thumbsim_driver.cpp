@@ -1,5 +1,6 @@
 #include "thumbsim.hpp"
 #include <stdio.h>
+#include <math.h>
 //#include <string.h>
 //#include <iostream>     // std::cout, std::endl
 //#include <iomanip>      // std::setbase
@@ -113,43 +114,21 @@ void Memory<Data32, Data32>::dump(DataType dt) const {
 // cache size in blocks). You should also update the "hits" and
 // "misses" counters.
 bool Cache::access(unsigned int address) {
-   int i, mask; //, adMask;
-   int tagsize = 32 - log2(size) - log2(blocksize); 
-   unsigned int b = int(address/blocksize) % size;
-   /* 
-   adMask = 0;
-   for (i = 0; i < 32; ++i)
-   {
-      if (i >= log2(blocksize) and i < (32 - tagsize))
-      {
-         adMask = adMask | (1 << i);
-      }
-   }
-   b = address & adMask;
-   b = b >> int(log2(blocksize));
-   */
+   int i, adMask, Nmask;
+   int tagsize;
+   int mask;
+   tagsize = 32 - log2(entries.size()) - log2(blocksize); 
+   unsigned int b = (address >> int(log2(blocksize))) % entries.size();
+   
    mask = 1;
    mask = ((mask << 31) >> (tagsize-1));
-   //for (i = 0; i < tagsize; ++i)
-   //{
-   //   mask = mask | (1 << (31 - i));
-   //}
-   //if (tagsize == 32)
-     // mask = 0xFFFFFFFF
-   //printf("numblocks: %d\n", size/blocksize);
-   //printf("tagsize: %d address: %x mask: %x tag: %x\n", tagsize, address, mask, (address & mask));   
-   //cout << "TAGSIZE: " << setbase(10) << tagsize << endl;
-   //cout << "MASK: " << setbase(16) << mask << endl;
-   //for (i = b; i < b + blocksize; ++i)
-   //{
-   //printf("entries[b]: %x tag: %x\n", entries[b], (address & mask));
-   //printf("Invalid b: %d blocksize: %d\n", b, blocksize);
-   //printf("here %d\n", entries[b] == (address & mask));
+   
    if (entries[b] == (address & mask))
    {
       ++hits;
       return true;
    }
+   
    ++misses;
    entries[b] = (address & mask);
    return false;
