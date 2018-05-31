@@ -266,8 +266,8 @@ void execute() {
         case ALU_SUBR:
           // STATS DONE
           result = rf[alu.instr.subr.rn] - rf[alu.instr.subr.rm];
-          //setNegativeZero(result);
-          //setCarryOverflow(rf[alu.instr.subr.rn], rf[alu.instr.subr.rm], OF_SUB);
+          setNegativeZero(result);
+          setCarryOverflow(rf[alu.instr.subr.rn], rf[alu.instr.subr.rm], OF_SUB);
           rf.write(alu.instr.subr.rd, result);
           stats.numRegReads += 2;
           stats.numRegWrites += 1;
@@ -287,8 +287,8 @@ void execute() {
         case ALU_SUB3I:
           // STATS DONE
           result = rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm;
-          //setNegativeZero(result);
-          //setCarryOverflow(rf[alu.instr.sub3i.rn], alu.instr.sub3i.imm, OF_SUB);
+          setNegativeZero(result);
+          setCarryOverflow(rf[alu.instr.sub3i.rn], alu.instr.sub3i.imm, OF_SUB);
           rf.write(alu.instr.sub3i.rd, result);
           stats.numRegReads += 1;
           stats.numRegWrites += 1;
@@ -324,8 +324,8 @@ void execute() {
         case ALU_SUB8I:
           // STATS DONE
           result = rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm;
-          //setNegativeZero(result);
-          //setCarryOverflow(rf[alu.instr.sub8i.rdn], alu.instr.sub8i.imm, OF_SUB);
+          setNegativeZero(result);
+          setCarryOverflow(rf[alu.instr.sub8i.rdn], alu.instr.sub8i.imm, OF_SUB);
           rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
           stats.numRegReads += 1;
           stats.numRegWrites += 1;
@@ -400,6 +400,7 @@ void execute() {
           //stats.numRegReads += 2;
           stats.numRegWrites += 1;
           //stats.instrs++;
+          // instructions and regreads commented out to match the expected output
         case SP_CMP:
           // need to implement these
           // DONE
