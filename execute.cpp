@@ -397,10 +397,10 @@ void execute() {
         case SP_ADD:
           // STATS DONE
           rf.write((sp.instr.add.d << 3) | sp.instr.add.rd, rf[(sp.instr.add.d << 3) | sp.instr.add.rd] + rf[sp.instr.add.rm]);
-          //stats.numRegReads += 2;
+          stats.numRegReads += 2;
           stats.numRegWrites += 1;
-          //stats.instrs++;
-          // instructions and regreads commented out to match the expected output
+          stats.instrs++;
+          break;
         case SP_CMP:
           // need to implement these
           // DONE
